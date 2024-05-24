@@ -1,21 +1,16 @@
 package com.alexsapps.gridcontentapplication
 
-import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 
-class GridViewModel(val listOfItemsVal: MutableStateFlow<MutableList<ListItem>>): ViewModel() {
+class GridViewModel(private val listOfItemsVal: MutableStateFlow<MutableList<ListItem>>): ViewModel() {
 
-    var _listOfItems: SnapshotStateList<ListItem> = mutableStateListOf()
+    private var _listOfItems: SnapshotStateList<ListItem> = mutableStateListOf()
 
 
     init {
@@ -27,11 +22,11 @@ class GridViewModel(val listOfItemsVal: MutableStateFlow<MutableList<ListItem>>)
         }
     }
 
-    var tempList =listOfItems
+
     val listOfItems get() = _listOfItems
 
-    val sourceItem = mutableStateOf<ListItem?>(null)
-    val destionationPosition = mutableStateOf<Int?>(null)
+    private val sourceItem = mutableStateOf<ListItem?>(null)
+    private val destinationPosition = mutableStateOf<Int?>(null)
 
 
 
@@ -40,37 +35,29 @@ class GridViewModel(val listOfItemsVal: MutableStateFlow<MutableList<ListItem>>)
 
     }
 
-    fun getDestionationPositionForDraggedItem(item: ListItem?) {
+    fun getDestinationPositionForDraggedItem(item: ListItem?) {
 
-        destionationPosition.value = listOfItems.indexOf(item)
-        Log.e("Positions", "DestionationPosition ViewModel:  ${destionationPosition.value}")
+        destinationPosition.value = listOfItems.indexOf(item)
 
     }
 
     fun resetDraggedAndDroppedItems() {
         sourceItem.value = null
-        destionationPosition.value = null
+        destinationPosition.value = null
 
     }
 
-    fun rearengeTheList() {
-        if (sourceItem.value != null && destionationPosition.value != null) {
-            tempList.remove(sourceItem.value)
-            tempList.add(destionationPosition.value!!, sourceItem.value!!)
-            updateList()
+    fun updateList() {
+        if (sourceItem.value != null && destinationPosition.value != null) {
+            _listOfItems.remove(sourceItem.value)
+            _listOfItems.add(destinationPosition.value!!, sourceItem.value!!)
+
         }
 
     }
 
-    fun updateList(): MutableList<ListItem> {
-        _listOfItems = tempList
-        return (listOfItems)
-    }
 
-    fun itemOnClickExtented(item: ListItem) {
-        //tempList[tempList.indexOf(item)] = item.onClick()
-        updateList()
-    }
+
 
 
 
